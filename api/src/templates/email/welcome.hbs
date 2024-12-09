@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Our Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-100">
+    <!-- Soft Black Header -->
+    <header class="bg-gray-900 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-2xl font-bold tracking-wide">Documenter</h1>
+        </div>
+    </header>
+
+    <!-- Content Middle -->
+    <main class="flex-grow flex items-center justify-center px-4 py-16">
+        <div class="text-center max-w-xl w-full bg-white p-12 rounded-xl shadow-sm">
+            <h2 class="text-4xl font-bold mb-6 text-gray-800">Welcome Aboard!</h2>
+            <p class="text-xl text-gray-600 mb-8">
+                Thank you for joining our platform. We're excited to have you as part of our community.
+            </p>
+            <a href="{{ link }}" class="inline-block bg-gray-900 text-white px-8 py-4 rounded-lg hover:bg-gray-700 transition duration-300 text-lg font-semibold">
+                Log In to Your Account
+            </a>
+        </div>
+    </main>
+
+    <!-- Soft Black Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">© Documenter. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
