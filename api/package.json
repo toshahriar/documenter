@@ -3,9 +3,11 @@
   "version": "1.0.1",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "init": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "consumer:dev": "tsx watch src/consumer.ts",
+    "consumer:start": "node dist/server.js",
     "migration": "tsx -r tsconfig-paths/register node_modules/typeorm/cli.js --dataSource src/data-source.ts migration:run",
     "migration:revert": "tsx -r tsconfig-paths/register node_modules/typeorm/cli.js --dataSource src/data-source.ts migration:revert",
     "seed": "tsx -r tsconfig-paths/register src/database/seeders/database.seeder.ts",
@@ -26,6 +28,8 @@
   "dependencies": {
     "@faker-js/faker": "^9.3.0",
     "@types/multer": "^1.4.12",
+    "amqp-connection-manager": "^4.1.14",
+    "amqplib": "^0.10.5",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -58,6 +62,7 @@
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@testing-library/jest-dom": "^6.6.3",
+    "@types/amqp-connection-manager": "^2.0.12",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",

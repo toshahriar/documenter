@@ -17,6 +17,7 @@ function show_help() {
   echo "  reset              Reset the environment (stop and remove volumes)"
   echo "  list               List running Docker containers"
   echo "  api-logs           View logs for the API service"
+  echo "  consumer-logs      View logs for the consumer service"
   echo "  web-logs           View logs for the web service"
   echo "  format             Format code using prettier"
   echo "  migration          Run migrations for the API service"
@@ -34,6 +35,7 @@ function prepare() {
 # Function to install dependencies for API and web services
 function install() {
   $DOCKER_COMPOSE run --rm api npm install
+  $DOCKER_COMPOSE run --rm consumer npm install
   $DOCKER_COMPOSE run --rm web npm install
 }
 
@@ -60,6 +62,11 @@ function list() {
 # Function to view logs for the API service
 function api_logs() {
   $DOCKER_COMPOSE logs -f api
+}
+
+# Function to view logs for the consumer service
+function consumer_logs() {
+  $DOCKER_COMPOSE logs -f consumer
 }
 
 # Function to view logs for the web service

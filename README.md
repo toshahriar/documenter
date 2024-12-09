@@ -2,6 +2,8 @@
 
 This application provides a robust solution for managing documents with seamless integration with DocuSign for electronic signature workflows. It simplifies document handling processes, from creation to signing, ensuring a secure and efficient workflow for users.
 
+![Dashboard of Documenter](./dashboard.png)
+
 ## **Features**:
 
 - **User Authentication**: Secure user registration, login, and profile management.
@@ -9,10 +11,20 @@ This application provides a robust solution for managing documents with seamless
 - **Analytics**: Gain insights into document usage and status with analytics.
 - **DocuSign Integration**:
    - Authenticate with DocuSign to enable signature workflows.
-   - Real-time webhook updates for signature events.
+   - ~~Real-time webhook updates for signature events.~~
 - **Secure Access**: All sensitive actions are protected using authentication middleware.
 
-![Dashboard of Documenter](./dashboard.png)
+## **Architecture**:
+![Overall Architecture](./architecture.png)
+
+## **Technology Stack**:
+
+- **Node.js/TypeScript**: Scalable, type-safe backend for asynchronous operations.
+- **React.js/Next.js**: High-performance, SEO-friendly frontend with SSR/SSG.
+- **Redux/RTK**: Predictable and scalable state management.
+- **PostgreSQL**: Reliable relational database with advanced querying.
+- **Redis**: In-memory store for caching and real-time data.
+- **RabbitMQ**: Message broker for asynchronous workflows and service decoupling.
 
 ---
 

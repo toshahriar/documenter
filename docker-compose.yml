@@ -36,6 +36,22 @@ services:
         aliases:
           - api
 
+  consumer:
+    image: ${PROJECT_NAME}-consumer:${IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: ./.docker/api/Dockerfile
+      target: ${BUILD_TARGET}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    command: npm run consumer:dev
+    volumes:
+      - ./api:/app
+    networks:
+      app-net:
+        aliases:
+          - consumer
+
   postgres:
     image: postgres:latest
     environment:

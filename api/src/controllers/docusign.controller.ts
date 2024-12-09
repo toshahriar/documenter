@@ -51,11 +51,15 @@ export class DocusignController {
     }
   };
 
-  webhook = async (req: Request, res: Response): Promise<Response> =>
-    new Responder(res)
+  webhook = async (req: Request, res: Response): Promise<Response> => {
+    // Need to implement this feature
+    console.log(req.body);
+
+    return new Responder(res)
       .status(ResponseStatus.SUCCESS)
-      .code(HttpStatus.CREATED)
-      .message('User registered successfully. Please verify your email.')
+      .code(HttpStatus.OK)
+      .message('Web hook api called!')
       .notify()
       .send();
+  };
 }

@@ -1,20 +1,22 @@
+import bcrypt from 'bcryptjs';
 import { CookieOptions, Request, Response } from 'express';
 import { UserService } from '@/services/user.service';
 import { AuthService } from '@/services/auth.service';
 import { EmailService } from '@/services/email.service';
-import { VerificationTokenService } from '@/services/verification-token.service';
 import { UserDto } from '@/dtos/user.dto';
-import { AuthenticationError, BadRequestError, UnprocessableEntityError } from '@/core/exceptions';
 import { appConfig } from '@/config/app';
 import { emailConfig } from '@/config/email';
 import { Responder } from '@/core/utils/responder';
 import { HttpStatus } from '@/core/enums/http-status.enum';
+import { RabbitMQProvider } from '@/providers/rabbitmq.provider';
 import { EmailTemplate } from '@/core/enums/email-template.enum';
 import { ResponseStatus } from '@/core/enums/response-status.enum';
-import bcrypt from 'bcryptjs';
 import { AuthTokenService } from '@/services/access-token.service';
 import { AuthTokenType } from '@/core/enums/auth-token-type.enum';
+import { EmailOptions } from '@/core/interfaces/email-options.interface';
+import { VerificationTokenService } from '@/services/verification-token.service';
 import { DocusignIntegrationService } from '@/services/docusign-integration.service';
+import { AuthenticationError, BadRequestError, UnprocessableEntityError } from '@/core/exceptions';
 
 export class AuthController {
   constructor(
@@ -54,13 +56,17 @@ export class AuthController {
     );
     const verificationLink = `${appConfig.API_URL}/v1/auth/account-verify?token=${verificationToken.token}&userId=${user.id}`;
 
-    await this.emailService.sendEmail({
+    const emailData: EmailOptions = {
       to: user.email,
       from: emailConfig.EMAIL_FROM,
       subject: 'Welcome! Please verify your email',
       template: EmailTemplate.ACCOUNT_VERIFICATION,
       context: { link: verificationLink },
-    });
+    };
+
+    await RabbitMQProvider.produce('email', emailData);
+
+    // await this.emailService.sendEmail(email);
 
     return new Responder(res)
       .status(ResponseStatus.SUCCESS)
@@ -95,13 +101,17 @@ export class AuthController {
     await this.userService.markEmailAsVerified(verificationToken.userId);
     await this.verificationTokenService.revokeEmailVerificationToken(user.id);
 
-    await this.emailService.sendEmail({
+    const emailData: EmailOptions = {
       to: user.email,
       from: emailConfig.EMAIL_FROM,
       subject: 'Account Verified! Welcome to Our Platform.',
       template: EmailTemplate.WELCOME,
       context: { link: appConfig.WEB_URL },
-    });
+    };
+
+    await RabbitMQProvider.produce('email', emailData);
+
+    // await this.emailService.sendEmail(email);
 
     return res.redirect(`${appConfig.WEB_URL}/account-verified`);
   };
@@ -187,13 +197,17 @@ export class AuthController {
     const verificationToken = await this.verificationTokenService.createPasswordResetToken(user.id);
     const verificationLink = `${appConfig.WEB_URL}/reset-password?token=${verificationToken.token}&userId=${user.id}`;
 
-    await this.emailService.sendEmail({
+    const emailData: EmailOptions = {
       to: user.email,
       from: emailConfig.EMAIL_FROM,
       subject: 'Password Reset Link',
       template: EmailTemplate.PASSWORD_RESET,
       context: { link: verificationLink },
-    });
+    };
+
+    await RabbitMQProvider.produce('email', emailData);
+
+    // await this.emailService.sendEmail(emailData);
 
     return new Responder(res)
       .status(ResponseStatus.SUCCESS)

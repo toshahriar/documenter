@@ -17,6 +17,7 @@ help:
 	@echo "  reset              Reset the environment (stop and remove volumes)"
 	@echo "  list               List running Docker containers"
 	@echo "  api-logs           View logs for the API service"
+	@echo "  consumer-logs      View logs for the consumer service"
 	@echo "  web-logs           View logs for the web service"
 	@echo "  format             Format code using Prettier"
 	@echo "  migration          Run migrations for the API service"
@@ -34,6 +35,7 @@ prepare:
 .PHONY: install
 install:
 	$(DOCKER_COMPOSE) run --rm api npm install
+	$(DOCKER_COMPOSE) run --rm consumer npm install
 	$(DOCKER_COMPOSE) run --rm web npm install
 
 # Docker container management
@@ -57,6 +59,10 @@ list:
 .PHONY: api-logs
 api-logs:
 	$(DOCKER_COMPOSE) logs -f api
+
+.PHONY: consumer-logs
+consumer-logs:
+	$(DOCKER_COMPOSE) logs -f consumer
 
 .PHONY: web-logs
 web-logs:

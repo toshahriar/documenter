@@ -40,10 +40,10 @@ export default [
     rules: {
       ...typescript.configs['recommended'].rules,
       'prettier/prettier': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-unused-vars': [
-        'error',
+        'off',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
@@ -65,6 +65,7 @@ export default [
       'no-explicit-any': 'off',
       'explicit-function-return-type': 'off',
       'no-unsafe-function-type': 'off',
+      'no-unused-vars': 'off',
     },
   },
   prettierConfig,

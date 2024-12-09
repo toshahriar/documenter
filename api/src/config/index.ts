@@ -5,12 +5,19 @@ import { logConfig } from '@/config/log';
 import { emailConfig } from '@/config/email';
 import { Logger } from '@/core/utils/logger';
 import { docusignConfig } from '@/config/docusign';
+import { rabbitMQConfig } from '@/config/rabbitmq';
 
 export const loadConfigs = async (): Promise<void> => {
   try {
-    [appConfig, databaseConfig, redisConfig, logConfig, emailConfig, docusignConfig].forEach(
-      (config) => config
-    );
+    [
+      appConfig,
+      databaseConfig,
+      redisConfig,
+      logConfig,
+      emailConfig,
+      docusignConfig,
+      rabbitMQConfig,
+    ].forEach((config) => config);
     Logger.info('All configurations validated successfully');
   } catch (error) {
     Logger.error('Configuration validation failed', error as Error);

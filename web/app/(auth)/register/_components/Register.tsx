@@ -80,7 +80,6 @@ const Register = () => {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            ={' '}
             <div className="relative">
               <Label htmlFor="firstName" className="text-sm font-medium">
                 First Name

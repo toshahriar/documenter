@@ -1,22 +1,31 @@
 import 'reflect-metadata';
-import app from './app';
 import { loadConfigs } from '@/config';
-import { loadProviders } from '@/providers';
-import { appConfig } from '@/config/app';
 import { Logger } from '@/core/utils/logger';
 import { config } from 'dotenv';
 import { RabbitMQProvider } from '@/providers/rabbitmq.provider';
+import { EmailService } from '@/services/email.service';
+import { EmailOptions } from '@/core/interfaces/email-options.interface';
 
 config();
 
-const start = async (): Promise<void> => {
+const consumer = async (): Promise<void> => {
   try {
     await loadConfigs();
-    await loadProviders();
+    Logger.info('Application configurations loaded successfully.');
+
+    const emailService = new EmailService();
+
     await RabbitMQProvider.initialize(['email']);
-    app.listen(appConfig.PORT, () => {
-      Logger.info(`Server is running on port: ${appConfig.PORT}`);
+    Logger.info('RabbitMQ provider initialized with queue: email');
+
+    await RabbitMQProvider.consume('email', async (message: unknown) => {
+      try {
+        await emailService.sendEmail(message as EmailOptions);
+      } catch (error) {
+        Logger.error('Failed to process message:', error as Error);
+      }
     });
+    Logger.info('Consumer started for queue: email');
   } catch (error: unknown) {
     Logger.error(
       `Server failed to start due to error: ${(error as Error).message}`,
@@ -41,4 +50,4 @@ process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) =>
   process.exit(1);
 });
 
-start();
+consumer();
