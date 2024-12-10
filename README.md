@@ -74,15 +74,16 @@ Use these credentials to log in after setup:
 
 ## **Available Commands**
 
-| Command         | Description                         |
-|-----------------|-------------------------------------|
-| `make prepare`  | Sets up environment files           |
-| `make install`  | Installs project dependencies       |
-| `make start`    | Starts the Docker containers        |
-| `make stop`     | Stops the Docker containers         |
-| `make reset`    | Stops containers and clears volumes |
-| `make api-logs` | Shows logs for the API service      |
-| `make web-logs` | Shows logs for the web service      |
+| Command              | Description                         |
+|----------------------|-------------------------------------|
+| `make prepare`       | Sets up environment files           |
+| `make install`       | Installs project dependencies       |
+| `make start`         | Starts the Docker containers        |
+| `make stop`          | Stops the Docker containers         |
+| `make reset`         | Stops containers and clears volumes |
+| `make api-logs`      | Shows logs for the API service      |
+| `make consumer-logs` | Shows logs for the consumer service |
+| `make web-logs`      | Shows logs for the web service      |
 
 By using the script.sh, you can also run all the commands supported by make!
 ```bash
@@ -92,6 +93,7 @@ By using the script.sh, you can also run all the commands supported by make!
 ./script.sh stop
 ./script.sh reset
 ./script.sh api-logs
+./script.sh consumer-logs
 ./script.sh web-logs
 ```
 ---
