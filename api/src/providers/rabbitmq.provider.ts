@@ -1,7 +1,6 @@
 import * as amqp from 'amqp-connection-manager';
 import { ConfirmChannel } from 'amqplib';
 import { Logger } from '@/core/utils/logger';
-import { InternalServerError } from '@/core/exceptions';
 import { rabbitMQConfig } from '@/config/rabbitmq';
 
 export class RabbitMQProvider {
@@ -18,17 +17,12 @@ export class RabbitMQProvider {
     try {
       this.queues = queueNames;
       this.instance = this.createConnection();
-      await this.setupExchangeAndQueues();
-
+      await this.setupQueues();
       this.isInitialized = true;
       Logger.info(`RabbitMQ initialized with queues: ${queueNames.join(', ')}`);
     } catch (error) {
-      Logger.error('Failed to initialize RabbitMQ', error as Error);
-      throw new InternalServerError(
-        'RabbitMQProvider',
-        'RabbitMQ initialization failed',
-        error as Error
-      );
+      this.logError('Failed to initialize RabbitMQ', error);
+      throw error;
     }
   }
 
@@ -36,61 +30,69 @@ export class RabbitMQProvider {
     const uri = `amqp://${rabbitMQConfig.RABBITMQ_USER}:${rabbitMQConfig.RABBITMQ_PASSWORD}@${rabbitMQConfig.RABBITMQ_HOST}:${rabbitMQConfig.RABBITMQ_PORT}/`;
     const connection = amqp.connect([uri]);
 
-    connection.on('connect', () => Logger.info('RabbitMQ client connected'));
-    connection.on('disconnect', (err) => Logger.error('RabbitMQ client disconnected', err?.err));
+    connection.on('connect', () => Logger.info('RabbitMQ client successfully connected'));
+    connection.on('disconnect', (error) =>
+      this.logError('RabbitMQ client disconnected', error?.err)
+    );
+    connection.on('blocked', (reason) => Logger.warn(`RabbitMQ connection blocked: ${reason}`));
+    connection.on('unblocked', () => Logger.info('RabbitMQ connection unblocked'));
+    connection.on('close', () => Logger.warn('RabbitMQ connection closed'));
 
     return connection;
   }
 
-  private static async setupExchangeAndQueues(): Promise<void> {
+  private static async setupQueues(): Promise<void> {
     const channel = await this.createChannel();
-
     await channel.addSetup(async (channel: ConfirmChannel) => {
       for (const queueName of this.queues) {
-        await channel.assertExchange(`${queueName}-exchange`, 'direct', { durable: true });
-        await channel.assertQueue(queueName, { durable: true });
-        await channel.bindQueue(queueName, `${queueName}-exchange`, queueName);
-        Logger.info(`Queue "${queueName}" bound to exchange "${queueName}-exchange"`);
+        try {
+          await channel.assertExchange(`${queueName}-exchange`, 'direct', { durable: true });
+          await channel.assertQueue(queueName, { durable: true });
+          await channel.bindQueue(queueName, `${queueName}-exchange`, queueName);
+          Logger.info(`Queue "${queueName}" set up successfully.`);
+        } catch (error) {
+          this.logError(`Error setting up queue "${queueName}"`, error);
+          throw error;
+        }
       }
     });
-
     this.channels.set('default', channel);
   }
 
   public static async produce(queueName: string, message: unknown): Promise<void> {
-    const channel = await this.getChannel(queueName);
-
-    await channel.publish(
-      `${queueName}-exchange`,
-      queueName,
-      message,
-      { contentType: 'application/json', persistent: true },
-      (err) => {
-        if (err) {
-          Logger.error(`Failed to send message to queue "${queueName}"`, err);
-          throw new Error(`Failed to publish message to queue "${queueName}": ${err.message}`);
-        }
-        Logger.info(`Message sent to queue "${queueName}": ${message}`);
-      }
-    );
+    try {
+      const channel = await this.getChannel(queueName);
+      await channel.publish(`${queueName}-exchange`, queueName, message, {
+        contentType: 'application/json',
+        persistent: true,
+      });
+      Logger.info(`Message sent to queue "${queueName}": ${JSON.stringify(message)}`);
+    } catch (error) {
+      this.logError(`Failed to send message to queue "${queueName}"`, error);
+      throw error;
+    }
   }
 
   public static async consume(queueName: string, callback: (msg: string) => void): Promise<void> {
-    const channel = await this.getChannel(queueName);
+    try {
+      const channel = await this.getChannel(queueName);
+      await channel.addSetup((channel: ConfirmChannel) =>
+        channel.consume(queueName, (msg) => {
+          if (!msg) return;
 
-    await channel.addSetup((channel: ConfirmChannel) =>
-      channel.consume(queueName, (msg) => {
-        if (msg) {
           try {
             callback(JSON.parse(msg.content.toString()));
             channel.ack(msg);
-          } catch (err) {
-            Logger.error(`Error processing message from queue "${queueName}"`, err as Error);
+          } catch (error) {
+            this.logError(`Error processing message from queue "${queueName}"`, error);
             channel.nack(msg);
           }
-        }
-      })
-    );
+        })
+      );
+    } catch (error) {
+      this.logError(`Failed to set up consumer for queue "${queueName}"`, error);
+      throw error;
+    }
   }
 
   public static async close(): Promise<void> {
@@ -102,27 +104,32 @@ export class RabbitMQProvider {
         await this.instance.close();
         Logger.info('RabbitMQ connection closed');
       }
-    } catch (err) {
-      Logger.error('Error during RabbitMQ shutdown', err as Error);
+    } catch (error) {
+      this.logError('Error during RabbitMQ shutdown', error);
     } finally {
       this.instance = null;
+      this.isInitialized = false;
     }
   }
 
   private static async getChannel(queueName: string): Promise<amqp.ChannelWrapper> {
     if (!this.queues.includes(queueName)) {
-      Logger.warn(`Queue "${queueName}" is not registered in the configuration.`);
-      throw new Error(`Queue "${queueName}" is not initialized.`);
+      const warningMessage = `Queue "${queueName}" is not registered.`;
+      Logger.warn(warningMessage);
+      throw new Error(warningMessage);
     }
 
     if (!this.channels.has(queueName)) {
       const channel = await this.createChannel();
-
       await channel.addSetup(async (ch: ConfirmChannel) => {
-        await ch.assertQueue(queueName, { durable: true }); // Ensure the queue exists
-        Logger.info(`Queue "${queueName}" dynamically created.`);
+        try {
+          await ch.assertQueue(queueName, { durable: true });
+          Logger.info(`Queue "${queueName}" dynamically created.`);
+        } catch (error) {
+          this.logError(`Error creating dynamic queue "${queueName}"`, error);
+          throw error;
+        }
       });
-
       this.channels.set(queueName, channel);
     }
 
@@ -131,11 +138,15 @@ export class RabbitMQProvider {
 
   private static async createChannel(): Promise<amqp.ChannelWrapper> {
     if (!this.instance) {
-      throw new Error('RabbitMQ connection is not initialized. Call initialize() first.');
+      const errorMessage = 'RabbitMQ connection is not initialized. Call initialize() first.';
+      Logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
+    return this.instance.createChannel({ json: true });
+  }
 
-    return this.instance.createChannel({
-      json: true,
-    });
+  private static logError(message: string, error: unknown): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    Logger.error(`${message}: ${errorMessage}`, error as Error);
   }
 }

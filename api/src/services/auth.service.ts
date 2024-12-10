@@ -23,6 +23,10 @@ export class AuthService {
       throw new BadRequestError(AuthService.name, 'User not found');
     }
 
+    if (!user.isVerified) {
+      throw new BadRequestError(AuthService.name, 'User is not verified.');
+    }
+
     const passwordMatches = await user.comparePassword(password);
     if (!passwordMatches) {
       throw new BadRequestError(AuthService.name, 'Invalid password');

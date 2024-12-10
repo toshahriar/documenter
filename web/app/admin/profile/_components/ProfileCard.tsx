@@ -36,7 +36,6 @@ export function ProfileCard() {
       <CardContent>
         <div className="space-y-2 text-center">
           <p className="text-sm text-gray-600">Email: {user.email}</p>
-          <p className="text-sm text-gray-600">Phone: {user.phone || 'N/A'}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center space-x-4"></CardFooter>

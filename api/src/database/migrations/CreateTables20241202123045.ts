@@ -5,6 +5,10 @@ export class CreateTables20241202123045 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    `);
+
+    await queryRunner.query(`
       CREATE TYPE public.verification_tokens_type_enum AS ENUM ('email_verification', 'password_reset');
     `);
 
@@ -82,6 +86,7 @@ export class CreateTables20241202123045 implements MigrationInterface {
         id uuid DEFAULT uuid_generate_v4() NOT NULL CONSTRAINT "pk_document_signers" PRIMARY KEY,
         name varchar NOT NULL,
         email varchar NOT NULL,
+        designation varchar NOT NULL,
         "order" integer NOT NULL,
         status public.document_status_enum DEFAULT 'pending' NOT NULL,
         metadata json,

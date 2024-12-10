@@ -21,6 +21,9 @@ export class DocumentSigner {
   @Column({ name: 'email', type: 'varchar' })
   email!: string;
 
+  @Column({ name: 'designation', type: 'varchar' })
+  designation!: string;
+
   @Column({ name: 'order', type: 'int' })
   order!: number;
 

@@ -39,10 +39,11 @@ class DocumentSeeder {
   private async createUser(): Promise<User> {
     const user = this.dataSource.manager.create(User, {
       firstName: 'Admin',
-      lastName: '1',
+      lastName: 'User',
       username: 'admin',
       email: 'admin@documenter.io',
       password: 'p@ssword',
+      isVerified: true,
     });
     return await this.dataSource.manager.save(user);
   }
@@ -90,6 +91,7 @@ class DocumentSeeder {
       const status = getWeightedStatus();
       return this.dataSource.manager.create(DocumentSigner, {
         name: faker.person.fullName(),
+        designation: 'Test',
         email: this.generateSignerEmail(),
         order: index + 1,
         status,

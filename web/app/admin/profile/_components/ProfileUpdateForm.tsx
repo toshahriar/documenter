@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { profileInit } from '@/app/admin/profile/_store/slice';
+import {ArrowRight, Loader2} from "lucide-react";
 
 const profileUpdateSchema = z
   .object({
@@ -81,6 +82,7 @@ export function ProfileUpdateForm() {
   const dispatch = useAppDispatch();
 
   const data = useAppSelector((state: any) => state?.me?.data ?? {});
+  const isLoading = useAppSelector((state: any) => state?.me?.loading ?? false);
 
   const {
     register,
@@ -179,11 +181,16 @@ export function ProfileUpdateForm() {
             />
 
             <div className="relative flex justify-end mx-auto">
-              <Button
-                type="submit"
-                className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-black px-4 py-2 rounded-md hover:bg-indigo-700 transition flex items-center gap-2"
-              >
-                Save Changes
+              <Button type="submit" className="w-[100px] bg-gradient-to-r from-yellow-400 to-yellow-300 text-black px-4 py-2 rounded-md hover:bg-indigo-700 transition flex items-center gap-2" disabled={isLoading}>
+                {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    </>
+                ) : (
+                    <>
+                      Save
+                    </>
+                )}
               </Button>
             </div>
           </div>

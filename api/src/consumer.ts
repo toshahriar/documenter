@@ -22,6 +22,7 @@ const consumer = async (): Promise<void> => {
       try {
         await emailService.sendEmail(message as EmailOptions);
       } catch (error) {
+        console.log(error);
         Logger.error('Failed to process message:', error as Error);
       }
     });

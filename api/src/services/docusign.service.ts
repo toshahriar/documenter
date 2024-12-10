@@ -14,11 +14,6 @@ export class DocusignService {
   ) {
     this.apiClient.setOAuthBasePath(docusignConfig.DS_OAUTH_BASE_PATH);
     this.apiClient.setBasePath(docusignConfig.DS_BASE_PATH);
-
-    this.initializeAuthHeader().catch(() => {
-      Logger.error('DocuSign: Failed to initialize Authorization header.');
-      throw new BadRequestError('DocuSign: Failed to initialize Authorization header.');
-    });
   }
 
   private async initializeAuthHeader(): Promise<void> {
@@ -41,7 +36,7 @@ export class DocusignService {
   }
 
   public async getToken(): Promise<{ accessToken: string; tokenExpiration: number }> {
-    let cachedData = await this.redisService.get('dsAuth');
+    const cachedData = await this.redisService.get('dsAuth');
     let data: { accessToken: string; tokenExpiration: number } | null = cachedData
       ? JSON.parse(cachedData)
       : null;
@@ -72,6 +67,8 @@ export class DocusignService {
 
   public async sendEnvelope(data: any): Promise<any> {
     try {
+      await this.initializeAuthHeader();
+
       const { filePath } = data.metadata.attachment;
       const docBase64 = await this.fileService.getBase64(filePath);
 

@@ -33,6 +33,7 @@ prepare:
 # Install dependencies
 .PHONY: install
 install:
+	$(DOCKER_COMPOSE) build
 	$(DOCKER_COMPOSE) run --rm api npm install
 	$(DOCKER_COMPOSE) run --rm consumer npm install
 	$(DOCKER_COMPOSE) run --rm web npm install

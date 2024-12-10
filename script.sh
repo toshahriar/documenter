@@ -33,6 +33,7 @@ function prepare() {
 
 # Function to install dependencies for API and web services
 function install() {
+  $DOCKER_COMPOSE build
   $DOCKER_COMPOSE run --rm api npm install
   $DOCKER_COMPOSE run --rm consumer npm install
   $DOCKER_COMPOSE run --rm web npm install

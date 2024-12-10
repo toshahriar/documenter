@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 config();
 
 const rabbitMQSchema = z.object({
-  RABBITMQ_HOST: z.string().default('localhost'),
+  RABBITMQ_HOST: z.string().default('rabbitmq'),
   RABBITMQ_PORT: z.number().default(5672),
   RABBITMQ_USER: z.string().default('documenter'),
   RABBITMQ_PASSWORD: z.string().default('p@ssword'),

@@ -10,14 +10,14 @@ import { ArrowDown, ArrowUp, Loader2, XIcon } from 'lucide-react';
 import { useAppSelector } from '@/redux/hooks';
 
 const signerSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 2 characters long'),
+  name: z.string().min(3, 'Name must be at least 3 characters long'),
   email: z.string().email('Invalid email address'),
-  designation: z.string().min(3, 'Designation must be at least 2 characters long'),
+  designation: z.string().min(2, 'Designation must be at least 2 characters long'),
   order: z.number().int().positive(),
 });
 
 const formSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 5 characters long'),
+  title: z.string().min(3, 'Title must be at least 3 characters long'),
   file: z
     .instanceof(File, { message: 'File is required' })
     .refine((file) => file.type === 'application/pdf', { message: 'Only PDF files are allowed' })

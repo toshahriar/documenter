@@ -58,9 +58,17 @@ This application provides a robust solution for managing documents with seamless
    make start
    ```
 
+5. **Run Migration & Seeder**:
+
+   ```bash
+   make migration
+   make seed
+   ```
+
+6. **Application URLs**:
     - **Web**: [http://localhost:3000](http://localhost:3000)
     - **API**: [http://localhost:3001](http://localhost:3001)
-
+   
 ---
 
 ## **Default Login Credentials**
@@ -82,8 +90,10 @@ Use these credentials to log in after setup:
 | `make stop`          | Stops the Docker containers         |
 | `make reset`         | Stops containers and clears volumes |
 | `make api-logs`      | Shows logs for the API service      |
-| `make consumer-logs` | Shows logs for the consumer service |
 | `make web-logs`      | Shows logs for the web service      |
+| `make consumer-logs` | Shows logs for the consumer service |
+| `make migration`     | Run the migrations of API service   |
+| `make seed`          | Insert fake data for development    |
 
 By using the script.sh, you can also run all the commands supported by make!
 ```bash
@@ -93,8 +103,10 @@ By using the script.sh, you can also run all the commands supported by make!
 ./script.sh stop
 ./script.sh reset
 ./script.sh api-logs
-./script.sh consumer-logs
 ./script.sh web-logs
+./script.sh consumer-logs
+./script.sh migration
+./script.sh seed
 ```
 ---
 
