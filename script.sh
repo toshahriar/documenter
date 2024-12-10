@@ -29,7 +29,6 @@ function show_help() {
 function prepare() {
   cp .env.example .env
   cp api/.env.example api/.env
-  cp web/.env.example web/.env
 }
 
 # Function to install dependencies for API and web services
